@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_cep/services/cep.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final textCep = TextEditingController();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Consulta VIACEP'),
@@ -17,6 +19,7 @@ class HomePage extends StatelessWidget {
             SizedBox(
               width: 400,
               child: TextFormField(
+                controller: textCep,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   label: Text('CEP'),
@@ -27,7 +30,7 @@ class HomePage extends StatelessWidget {
             ElevatedButton(
               child: const Text('Consultar'),
               onPressed: () {
-                
+                consultar(textCep.text);
               },
             ),
           ],
