@@ -1,11 +1,14 @@
+import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cep/services/cep.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_cep/services/cep_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final resposta = ValueNotifier<String>('');
     final textCep = TextEditingController();
     final formKey = GlobalKey<FormState>();
     return Scaffold(
@@ -23,6 +26,10 @@ class HomePage extends StatelessWidget {
                 width: 400,
                 child: TextFormField(
                   controller: textCep,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    CepInputFormatter(),
+                  ],
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     label: Text('CEP'),
@@ -31,10 +38,11 @@ class HomePage extends StatelessWidget {
                     if (valor == null || valor.isEmpty) {
                       return 'Você deve informar um CEP! SEU ANIMAL';
                     }
-                    if (valor.length != 8) {
+                    final texto = valor.replaceAll(RegExp(r'[.-]'), '');
+                    if (texto.length != 8) {
                       return 'Você deve informar um CEP com 8 dígitos!';
                     }
-                    if (!validarCep(valor)) {
+                    if (!validarCep(texto)) {
                       return 'Cep inválido';
                     }
                     // Passou na validação
@@ -45,9 +53,29 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 40),
               ElevatedButton(
                 child: const Text('Consultar'),
-                onPressed: () {
+                onPressed: () async {
                   if (formKey.currentState!.validate()) {
-                    consultar(textCep.text);
+                    try {
+                      resposta.value = '0';
+                      final res = await consultar(textCep.text.replaceAll(RegExp(r'[.-]'), ''));
+                      resposta.value = '$res';
+                    } catch (e) {
+                      resposta.value = 'Erro!';
+                    }
+                  }
+                },
+              ),
+              const SizedBox(height: 40),
+              ValueListenableBuilder<String>(
+                valueListenable: resposta,
+                builder: (context, res, child) {
+                  if (res == '0') {
+                    return const CircularProgressIndicator();
+                  } else {
+                    return Text(res,
+                        style: const TextStyle(
+                          fontSize: 28,
+                        ));
                   }
                 },
               ),

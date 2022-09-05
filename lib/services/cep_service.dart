@@ -1,19 +1,19 @@
+import 'package:flutter_cep/models/cep.dart';
 import 'package:http/http.dart';
 
-void consultar(String cep) async {
+Future<Cep> consultar(String cep) async {
   if (cep.isEmpty) {
-    print('Envia o CEP seu animal!');
-    return;
+    throw ('Envia o CEP seu animal!');
   }
   if (validarCep(cep)) {
     try {
       final res = await get(Uri.https('viacep.com.br', '/ws/$cep/json/'));
-      print(res.body);
+      return Cep.fromJson(res.body);
     } catch (e) {
-      print('Ocorreu um erro!');
+      rethrow;
     }
   } else {
-    print('CEP inválido');
+    throw ('CEP inválido');
   }
 }
 
