@@ -9,7 +9,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final resposta = ValueNotifier<String>('');
-    final textCep = TextEditingController();
+    final textCep = TextEditingController(text: '68455684');
     final formKey = GlobalKey<FormState>();
     return Scaffold(
       appBar: AppBar(
@@ -59,8 +59,9 @@ class HomePage extends StatelessWidget {
                       resposta.value = '0';
                       final res = await consultar(textCep.text.replaceAll(RegExp(r'[.-]'), ''));
                       resposta.value = '$res';
-                    } catch (e) {
+                    } catch (e, s) {
                       resposta.value = 'Erro!';
+                      // print(e);
                     }
                   }
                 },

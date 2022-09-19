@@ -1,16 +1,28 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_cep/models/cep.dart';
 import 'package:http/http.dart';
 
+// https://karlaycosta.cloudns.nz/ws/?
 Future<Cep> consultar(String cep) async {
   if (cep.isEmpty) {
     throw ('Envia o CEP seu animal!');
   }
   if (validarCep(cep)) {
+    final client = HttpClient();
     try {
-      final res = await get(Uri.https('viacep.com.br', '/ws/$cep/json/'));
-      return Cep.fromJson(res.body);
+      final req = await client.getUrl(Uri.http('cep.la', cep));
+      req.headers.set('Accept', 'application/json', preserveHeaderCase: true);
+      final res = await req.close();
+      final body = await res.transform(utf8.decoder).join();
+      // final res = await get(Uri.http('cep.la', cep),
+      //     headers: {'Accept': 'application/json'});
+      return Cep.fromJson(body);
     } catch (e) {
       rethrow;
+    } finally {
+      client.close();
     }
   } else {
     throw ('CEP inválido');

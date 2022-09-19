@@ -19,7 +19,7 @@ class Cep {
     return Cep(
       cep: map['cep'],
       uf: map['uf'],
-      cidade: map['localidade'],
+      cidade: map['cidade'],
       bairro: map['bairro'],
       logradouro: map['logradouro'],
     );
